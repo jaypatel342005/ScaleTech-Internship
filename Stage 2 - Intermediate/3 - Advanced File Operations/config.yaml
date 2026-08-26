@@ -1,0 +1,17 @@
+app:
+  name: StudentApp
+  version: 1.0
+  debug: true
+database:
+  host: localhost
+  port: 5432
+  credentials:
+    username: admin
+    password: secret
+developers:
+- Jay
+- Rahul
+- Amit
+features:
+  authentication: true
+  logging: true
