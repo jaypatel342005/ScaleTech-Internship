@@ -4,6 +4,7 @@ from collections import Counter, defaultdict, deque
 nums = [1, 2, 2, 3, 3, 3, 4]
 c = Counter(nums)
 print(c)
+print(type(c)) # <class 'collections.Counter'>
 
 # counter with string
 text = "banana"

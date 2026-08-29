@@ -1,0 +1,65 @@
+{
+    "latest_version": "Python 3.14.7",
+    "news": [
+        {
+            "title": "Ramya Ravi: 2026 PSF Board Election Candidate Interview",
+            "href": "https://pyfound.blogspot.com/2026/08/ramya-ravi-2026-psf-board-election.html",
+            "date": "2026-08-25"
+        },
+        {
+            "title": "Petr Andreev: 2026 PSF Board Election Candidate Interview",
+            "href": "https://pyfound.blogspot.com/2026/08/petr-andreev-2026-psf-board-election.html",
+            "date": "2026-08-25"
+        },
+        {
+            "title": "Nina Zakharenko: 2026 PSF Board Election Candidate Interview",
+            "href": "https://pyfound.blogspot.com/2026/08/nina-zakharenko-2026-psf-board-election.html",
+            "date": "2026-08-25"
+        },
+        {
+            "title": "Keith Murray: 2026 PSF Board Election Candidate Interview",
+            "href": "https://pyfound.blogspot.com/2026/08/keith-murray-2026-psf-board-election.html",
+            "date": "2026-08-25"
+        },
+        {
+            "title": "Karo Ladino-Puerto: 2026 PSF Board Election Candidate Interview",
+            "href": "https://pyfound.blogspot.com/2026/08/karo-ladino-puerto-2026-psf-board.html",
+            "date": "2026-08-25"
+        }
+    ],
+    "events": [
+        {
+            "event": "PyDay Boyacá 2026",
+            "href": "/events/python-events/2202/",
+            "date": "2026-09-12"
+        },
+        {
+            "event": "PyCon Cameroon 2026",
+            "href": "/events/python-events/2159/",
+            "date": "2026-09-17"
+        },
+        {
+            "event": "PythonCamp Rügen 2026",
+            "href": "/events/python-user-group/2182/",
+            "date": "2026-09-26"
+        },
+        {
+            "event": "PyBay 2026",
+            "href": "/events/python-events/2136/",
+            "date": "2026-10-03"
+        },
+        {
+            "event": "PyCon Africa 2026",
+            "href": "/events/python-events/2187/",
+            "date": "2026-10-07"
+        }
+    ],
+    "applications": [
+        "Web Development:Django,Pyramid,Bottle,Tornado,Flask,Litestar,FastAPI",
+        "GUI Development:tkInter,PyGObject,PyQt,PySide,Kivy,wxPython,DearPyGui",
+        "AI and Machine Learning:PyTorch,TensorFlow,scikit-learn,Transformers,Anthropic,LangChain",
+        "Scientific and Numeric:SciPy,Pandas,IPython",
+        "Software Development:Buildbot,Trac,Roundup",
+        "System Administration:Ansible,Salt,OpenStack,xonsh"
+    ]
+}

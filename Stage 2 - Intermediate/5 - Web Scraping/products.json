@@ -1,0 +1,14 @@
+[
+    {
+        "name": "Laptop",
+        "price": "Rs.50000"
+    },
+    {
+        "name": "Phone",
+        "price": "Rs.30000"
+    },
+    {
+        "name": "Tablet",
+        "price": "Rs.20000"
+    }
+]
