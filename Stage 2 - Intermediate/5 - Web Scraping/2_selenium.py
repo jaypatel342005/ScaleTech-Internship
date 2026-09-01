@@ -13,7 +13,7 @@ DIR = os.path.dirname(os.path.abspath(__file__))
 
 # open browser and visit a page
 driver = webdriver.Chrome()
-driver.get("https://example.com")
+driver.get("https://www.python.org")
 
 print(driver.title)
 print(driver.current_url)
@@ -73,7 +73,7 @@ driver.quit()
 # ---- explicit waits (better than time.sleep) ----
 
 driver = webdriver.Chrome()
-driver.get("https://example.com")
+driver.get("https://www.python.org")
 
 # wait up to 10 seconds until element is present
 try:
@@ -90,7 +90,7 @@ driver.quit()
 # ---- scrolling ----
 
 driver = webdriver.Chrome()
-driver.get("https://example.com")
+driver.get("https://www.python.org")
 
 # scroll to bottom of page
 driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
