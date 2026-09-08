@@ -2,28 +2,28 @@
     "latest_version": "Python 3.14.7",
     "news": [
         {
+            "title": "The 2026 PSF Board Election is Open!",
+            "href": "https://pyfound.blogspot.com/2026/09/the-2026-psf-board-election-is-open.html",
+            "date": "2026-09-01"
+        },
+        {
+            "title": "Inaugural Python Packaging Council Election: Voting is now open!",
+            "href": "https://pyfound.blogspot.com/2026/09/inaugural-python-packaging-council.html",
+            "date": "2026-09-01"
+        },
+        {
+            "title": "Python 3.15.0 candidate 2 is here!",
+            "href": "https://blog.python.org/2026/09/python-3150-rc2/",
+            "date": "2026-09-01"
+        },
+        {
+            "title": "Kojo Idrissa: 2026 PSF Board Election Candidate Interview",
+            "href": "https://pyfound.blogspot.com/2026/08/kojo-idrissa-2026-psf-board-election.html",
+            "date": "2026-08-31"
+        },
+        {
             "title": "Ramya Ravi: 2026 PSF Board Election Candidate Interview",
             "href": "https://pyfound.blogspot.com/2026/08/ramya-ravi-2026-psf-board-election.html",
-            "date": "2026-08-25"
-        },
-        {
-            "title": "Petr Andreev: 2026 PSF Board Election Candidate Interview",
-            "href": "https://pyfound.blogspot.com/2026/08/petr-andreev-2026-psf-board-election.html",
-            "date": "2026-08-25"
-        },
-        {
-            "title": "Nina Zakharenko: 2026 PSF Board Election Candidate Interview",
-            "href": "https://pyfound.blogspot.com/2026/08/nina-zakharenko-2026-psf-board-election.html",
-            "date": "2026-08-25"
-        },
-        {
-            "title": "Keith Murray: 2026 PSF Board Election Candidate Interview",
-            "href": "https://pyfound.blogspot.com/2026/08/keith-murray-2026-psf-board-election.html",
-            "date": "2026-08-25"
-        },
-        {
-            "title": "Karo Ladino-Puerto: 2026 PSF Board Election Candidate Interview",
-            "href": "https://pyfound.blogspot.com/2026/08/karo-ladino-puerto-2026-psf-board.html",
             "date": "2026-08-25"
         }
     ],
