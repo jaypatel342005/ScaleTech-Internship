@@ -10,6 +10,7 @@ def my_decorator(func):
         func()
         print("after function")
     return wrapper
+    
 
 
 @my_decorator

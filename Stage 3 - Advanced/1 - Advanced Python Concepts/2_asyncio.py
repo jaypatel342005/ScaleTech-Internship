@@ -193,3 +193,4 @@ async def scrape_all():
 
 
 asyncio.run(scrape_all())
+

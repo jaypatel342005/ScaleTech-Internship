@@ -200,6 +200,7 @@ if __name__ == "__main__":
         list(ex.map(cpu_heavy, inputs))
     print(f"multiprocessing CPU: {time.time() - start:.2f}s")
 
+
     print("""
     | Use Case          | Best Choice      |
     |-------------------|------------------|

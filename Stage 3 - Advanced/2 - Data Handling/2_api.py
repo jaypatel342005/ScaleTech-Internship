@@ -116,6 +116,7 @@ print(response.text[:100])
 print(response.json())
 
 
+
 # rest conventions
 # GET    /posts       - get all
 # GET    /posts/1     - get one

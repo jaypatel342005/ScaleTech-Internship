@@ -99,6 +99,7 @@ data2 = {
 }
 df2 = pd.DataFrame(data2)
 
+
 print(df2.isnull())
 print(df2.isnull().sum())
 print(df2.dropna())
