@@ -44,6 +44,7 @@ def test_invalid_discount():
 
 # fixtures - functions decorated with @pytest.fixture that return test data
 # pytest automatically passes the fixture's return value to any test that names it as a parameter
+# like initializing a database, spinning up a web browser, or generating dummy mock data
 @pytest.fixture
 def sample_prices():
     # this data is shared across any test that uses the 'sample_prices' parameter

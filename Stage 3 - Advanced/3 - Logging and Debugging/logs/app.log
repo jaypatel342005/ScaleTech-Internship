@@ -1,0 +1,28 @@
+2026-09-09 20:25:54,843 - INFO - this also goes to app.log
+2026-09-09 20:25:54,843 - ERROR - error saved to file
+2026-09-09 20:25:54,844 - ERROR - divide failed
+Traceback (most recent call last):
+  File "d:\College programming\Scaletech Internship\Stage 3 - Advanced\3 - Logging and Debugging\1_logging.py", line 83, in divide
+    return a / b
+           ~~^~~
+ZeroDivisionError: division by zero
+2026-09-09 20:25:54,882 - INFO - rotating log entry
+2026-09-09 20:25:54,882 - INFO - salary calc started
+2026-09-09 20:25:54,882 - INFO - salary=20000
+2026-09-09 20:25:54,882 - INFO - salary calc started
+2026-09-09 20:25:54,883 - WARNING - negative input given
+2026-09-09 20:25:54,883 - ERROR - bad input: hours and rate must be positive
+2026-09-09 20:26:06,511 - INFO - this also goes to app.log
+2026-09-09 20:26:06,512 - ERROR - error saved to file
+2026-09-09 20:26:06,515 - ERROR - divide failed
+Traceback (most recent call last):
+  File "d:\College programming\Scaletech Internship\Stage 3 - Advanced\3 - Logging and Debugging\1_logging.py", line 83, in divide
+    return a / b
+           ~~^~~
+ZeroDivisionError: division by zero
+2026-09-09 20:26:06,517 - INFO - rotating log entry
+2026-09-09 20:26:06,518 - INFO - salary calc started
+2026-09-09 20:26:06,518 - INFO - salary=20000
+2026-09-09 20:26:06,519 - INFO - salary calc started
+2026-09-09 20:26:06,520 - WARNING - negative input given
+2026-09-09 20:26:06,520 - ERROR - bad input: hours and rate must be positive

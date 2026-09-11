@@ -1,0 +1,26 @@
+2026-09-09 20:28:36,881 - INFO - processing 5 items
+2026-09-09 20:28:36,882 - DEBUG - price=50000 discount=10
+2026-09-09 20:28:36,882 - INFO - final=45000.0
+2026-09-09 20:28:36,883 - DEBUG - price=30000 discount=5
+2026-09-09 20:28:36,883 - INFO - final=28500.0
+2026-09-09 20:28:36,883 - DEBUG - price=-100 discount=20
+2026-09-09 20:28:36,883 - WARNING - negative price
+2026-09-09 20:28:36,884 - ERROR - skipping tablet: price cant be negative
+Traceback (most recent call last):
+  File "d:\College programming\Scaletech Internship\Stage 3 - Advanced\3 - Logging and Debugging\practice.py", line 42, in process_order
+    price = calculate_discount(item["price"], item["discount"])
+  File "d:\College programming\Scaletech Internship\Stage 3 - Advanced\3 - Logging and Debugging\practice.py", line 25, in calculate_discount
+    raise ValueError("price cant be negative")
+ValueError: price cant be negative
+2026-09-09 20:28:36,923 - DEBUG - price=1500 discount=150
+2026-09-09 20:28:36,923 - WARNING - bad discount: 150
+2026-09-09 20:28:36,924 - ERROR - skipping charger: discount must be 0-100
+Traceback (most recent call last):
+  File "d:\College programming\Scaletech Internship\Stage 3 - Advanced\3 - Logging and Debugging\practice.py", line 42, in process_order
+    price = calculate_discount(item["price"], item["discount"])
+  File "d:\College programming\Scaletech Internship\Stage 3 - Advanced\3 - Logging and Debugging\practice.py", line 29, in calculate_discount
+    raise ValueError("discount must be 0-100")
+ValueError: discount must be 0-100
+2026-09-09 20:28:36,926 - DEBUG - price=2000 discount=15
+2026-09-09 20:28:36,927 - INFO - final=1700.0
+2026-09-09 20:28:36,927 - INFO - total=75200.0
