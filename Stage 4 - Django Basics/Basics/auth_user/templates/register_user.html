@@ -27,6 +27,7 @@
 
             <!-- Messages -->
             {% if messages %}
+
                 {% for message in messages %}
                 <div class="alert alert-danger py-2 px-3 mb-3" role="alert">
                     {{ message }}
@@ -37,6 +38,7 @@
             <!-- Form -->
             <form action="" method="POST">
                 {% csrf_token %}
+                
 
                 <div class="mb-3">
                     <label for="username" class="form-label text-secondary small text-uppercase fw-semibold">Username</label>
@@ -56,6 +58,14 @@
                 <div class="mb-4">
                     <label for="password2" class="form-label text-secondary small text-uppercase fw-semibold">Confirm Password</label>
                     <input type="password" class="form-control bg-dark border-secondary text-white" id="password2" name="retype_password" placeholder="••••••••" autocomplete="new-password">
+                </div>
+
+                <div class="mb-4">
+                    <label for="role" class="form-label text-secondary small text-uppercase fw-semibold">Role</label>
+                    <select class="form-control bg-dark border-secondary text-white" id="role" name="role">
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
                 </div>
 
                 <button type="submit" id="register-btn" class="btn btn-primary w-100 py-2 fw-semibold">

@@ -35,15 +35,21 @@
             <a class="nav-link" href="/todo/">Todos</a>
         </li>
 
+
         <!-- Auth links pushed to the right -->
+        {% if user.is_authenticated %}
         <li class="nav-item ms-auto" role="presentation">
-            {% if user.is_authenticated %}
-                <a class="nav-link" href="/auth/logout_user">Logout</a>
-            {% else %}
-                <a class="nav-link" href="/auth/login_user">Login</a>
-            {% endif %}
+            <span class="nav-link text-primary fw-semibold">
+                <i class="bi bi-person-circle me-1"></i>{{ user.username }}
+            </span>
         </li>
-        {% if not user.is_authenticated %}
+        <li class="nav-item" role="presentation">
+            <a class="nav-link text-danger" href="/auth/logout_user">Logout</a>
+        </li>
+        {% else %}
+        <li class="nav-item ms-auto" role="presentation">
+            <a class="nav-link" href="/auth/login_user">Login</a>
+        </li>
         <li class="nav-item" role="presentation">
             <a class="nav-link" href="/auth/register_user">Register</a>
         </li>

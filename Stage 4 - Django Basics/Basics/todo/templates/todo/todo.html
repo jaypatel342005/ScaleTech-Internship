@@ -4,10 +4,20 @@
 
 <div class="container mt-4">
 
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
     <h2 class="mb-1">Todo List</h2>
     <p class="text-muted mb-4">Total Tasks: {{ todos|length }}</p>
 
     <a href="create_todo" class="btn btn-primary mb-3">Create Todo</a>
+
 
     <table class="table table-bordered table-striped table-hover">
         <thead class="table-dark">
@@ -46,6 +56,7 @@
                 </td>
                 <td>{{ todo.created_at|date:"M d, Y H:i" }}</td>
                 <td>{{ todo.updated_at|date:"M d, Y H:i" }}</td>
+                {% if user.custom_user.is_admin or user.is_superuser %}
                 <td>
                     <a href="{% url 'delete_todo' todo.id %}" class="btn btn-danger btn-sm">Delete</a>
                     <a href="{% url 'update_todo' todo.id %}" class="btn btn-primary btn-sm">Update</a>
@@ -59,6 +70,20 @@
                         </a>
                     {% endif %}
                 </td>
+                {% elif user.custom_user.is_user %}
+                <td>
+                    <a href="{% url 'delete_todo' todo.id %}" class="btn btn-white btn-sm" style="background-color: var(--bs-gray-500);">Delete</a>
+                    {% if todo.status == 'COMPLETED' %}
+                        <a href="{% url 'status_todo' todo.id %}" class="btn btn-success btn-sm" title="Mark as Pending">
+                            <i class="bi bi-check2-square"></i>
+                        </a>
+                    {% else %}
+                        <a href="{% url 'status_todo' todo.id %}" class="btn btn-secondary btn-sm" title="Mark as Completed">
+                            <i class="bi bi-square"></i>
+                        </a>
+                    {% endif %}
+                </td>
+                {% endif %}
             </tr>
             {% empty %}
             <tr>
