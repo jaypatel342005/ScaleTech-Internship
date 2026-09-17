@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'members',
     'home',
     'todo',
+    'auth_user',
 
 ]
 
