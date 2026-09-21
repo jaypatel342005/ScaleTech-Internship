@@ -1,0 +1,13 @@
+
+from django.contrib import admin
+from django.urls import path , include
+from . import views
+
+urlpatterns = [
+    path('',views.user_get, name = 'user_get'),
+    path('create/',views.user_post, name = 'user_post'),
+    path('csrf/', views.get_csrf, name='get_csrf'),
+    path('delete/<str:username>/',views.user_delete, name = 'user_delete'),
+    path('update/<int:id>/' , views.user_put , name = 'user_put')
+    
+]

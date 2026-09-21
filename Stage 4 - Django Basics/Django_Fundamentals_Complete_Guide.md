@@ -3011,3 +3011,1049 @@ Use this to track your Django understanding:
 *Updated for Jay Patel - Python/Django Internship - Stage 4: Django Basics*
 *Covers: URL Routing, Static Files, Testing, ORM, Relationships, Forms & Validations*
 *Reference: Django Official Documentation - https://docs.djangoproject.com/*
+
+---
+
+## 39. Authentication vs Authorization
+
+This is the **first interview question** you must know cold.
+
+| Concept | Question It Answers | Example |
+|---|---|---|
+| **Authentication** | Who are you? | User logs in with email + password |
+| **Authorization** | What are you allowed to do? | Manager can add products but not delete |
+
+```
+Authentication = Verifying identity
+Authorization  = Verifying permissions
+```
+
+---
+
+## 40. Django's Built-in Authentication System
+
+Django provides a complete authentication framework out of the box.
+
+```python
+# Already included in default INSTALLED_APPS:
+'django.contrib.auth',
+'django.contrib.contenttypes',
+'django.contrib.sessions',
+```
+
+Key components:
+```
+django.contrib.auth
+    |
+    +-- User model
+    +-- Group model
+    +-- Permission model
+    +-- authenticate()
+    +-- login()
+    +-- logout()
+    +-- Password hashing
+    +-- AuthenticationMiddleware
+```
+
+---
+
+## 41. Django Default User Model
+
+```python
+from django.contrib.auth.models import User
+
+# Default fields:
+# id, username, first_name, last_name, email, password
+# is_staff, is_active, is_superuser, last_login, date_joined
+```
+
+### Creating Users
+
+```python
+# CORRECT - handles password hashing
+user = User.objects.create_user(
+    username="jay",
+    email="jay@gmail.com",
+    password="SecurePass123"
+)
+
+# WRONG - stores password incorrectly
+user.password = "SecurePass123"   # DO NOT do this
+```
+
+### User Flags
+
+| Flag | Purpose |
+|---|---|
+| `is_active` | Enable/disable account (False = disabled) |
+| `is_staff` | Can access Django Admin |
+| `is_superuser` | Bypasses all permission checks |
+
+---
+
+## 42. Password Hashing
+
+Django **never stores plain text passwords**. It uses a password-hashing framework.
+
+```
+User enters: "Hello123"
+      |
+      v
+Password Hasher (PBKDF2 by default)
+      |
+      v
+Salt + Hash
+      |
+      v
+Stored in database as: "pbkdf2_sha256$..."
+```
+
+### Key Methods
+
+```python
+user.set_password("NewPassword123")   # hash and set password
+user.check_password("Hello123")       # returns True or False
+user.save()                           # always save after set_password
+```
+
+> **Interview Q:** Can Django decrypt a password?
+> **Answer:** No. Passwords are hashed (one-way), not encrypted for retrieval.
+
+---
+
+## 43. Login / Logout System
+
+### Registration View
+
+```python
+from django.contrib.auth.models import User
+from django.shortcuts import render, redirect
+
+def register(request):
+    if request.method == "POST":
+        username = request.POST["username"]
+        email = request.POST["email"]
+        password = request.POST["password"]
+
+        User.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+        )
+        return redirect("login")
+
+    return render(request, "accounts/register.html")
+```
+
+### Login View
+
+```python
+from django.contrib.auth import authenticate, login
+
+def login_view(request):
+    if request.method == "POST":
+        username = request.POST["username"]
+        password = request.POST["password"]
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)           # creates authenticated session
+            return redirect("dashboard")
+
+        return render(request, "accounts/login.html", {"error": "Invalid credentials"})
+
+    return render(request, "accounts/login.html")
+```
+
+### Logout View
+
+```python
+from django.contrib.auth import logout
+
+def logout_view(request):
+    logout(request)                        # destroys the session
+    return redirect("login")
+```
+
+---
+
+## 44. How authenticate() Works
+
+```
+username + password
+      |
+      v
+authenticate(request, username=..., password=...)
+      |
+      v
+Find user in DB
+      |
+      v
+check_password(hash)
+      |
+      +-----+-----+
+      |           |
+    VALID      INVALID
+      |           |
+   User obj     None
+```
+
+---
+
+## 45. Sessions and request.user
+
+After `login(request, user)`, Django stores the user's identity in a **session**.
+
+```
+Browser
+  |  Login
+  v
+Django
+  |
+  +-- Verify credentials
+  +-- Create session in DB
+  +-- Set session cookie in browser
+
+Next request:
+Browser --> Session Cookie --> Django
+                                 |
+                         AuthenticationMiddleware
+                                 |
+                           request.user = Jay
+```
+
+### Using request.user in Views
+
+```python
+def dashboard(request):
+    if request.user.is_authenticated:
+        print(request.user.username)     # "jay"
+        print(request.user.email)        # "jay@gmail.com"
+    else:
+        return redirect("login")
+```
+
+### In Templates
+
+```html
+{% if user.is_authenticated %}
+    <p>Welcome, {{ user.username }}</p>
+    <a href="/logout/">Logout</a>
+{% else %}
+    <a href="/login/">Login</a>
+{% endif %}
+```
+
+---
+
+## 46. Authentication Decorators and Mixins
+
+### @login_required (FBV)
+
+```python
+from django.contrib.auth.decorators import login_required
+
+@login_required                        # redirects to /accounts/login/ if not authenticated
+def dashboard(request):
+    return render(request, "dashboard.html")
+
+# Custom login URL
+@login_required(login_url="/auth/login/")
+def dashboard(request):
+    ...
+```
+
+### LoginRequiredMixin (CBV)
+
+```python
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import ListView
+
+class StudentListView(LoginRequiredMixin, ListView):
+    model = Student
+    login_url = "/auth/login/"
+```
+
+### @permission_required (FBV)
+
+```python
+from django.contrib.auth.decorators import permission_required
+
+@permission_required("products.add_product")
+def create_product(request):
+    ...
+
+@permission_required("products.delete_product", raise_exception=True)
+def delete_product(request, id):
+    ...
+```
+
+### PermissionRequiredMixin (CBV)
+
+```python
+from django.contrib.auth.mixins import PermissionRequiredMixin
+
+class ProductCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+    model = Product
+    permission_required = "products.add_product"
+```
+
+---
+
+## 47. Why Override the Default User Model?
+
+The default `User` only has `username`, `email`, `first_name`, `last_name`. Real projects need more.
+
+**Always define a custom User model at the start of a project** — changing it later is painful.
+
+```
+Create project
+     |
+     v
+Create accounts app
+     |
+     v
+Define Custom User model
+     |
+     v
+Set AUTH_USER_MODEL in settings.py
+     |
+     v
+python manage.py makemigrations
+python manage.py migrate
+```
+
+---
+
+## 48. AbstractUser vs AbstractBaseUser
+
+| | AbstractUser | AbstractBaseUser |
+|---|---|---|
+| What it provides | All default User fields + auth | Only password + last_login |
+| Customization | Add extra fields | Build from scratch |
+| LOGIN_FIELD default | `username` | You define it |
+| Use when | You want to extend the default User | You need email login or full custom auth |
+| Complexity | Lower | Higher |
+
+---
+
+## 49. Custom User with AbstractUser
+
+```python
+# accounts/models.py
+from django.contrib.auth.models import AbstractUser
+from django.db import models
+
+class User(AbstractUser):
+    phone = models.CharField(max_length=15, blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)
+    profile_image = models.ImageField(upload_to="avatars/", blank=True)
+
+    def __str__(self):
+        return self.username
+```
+
+```python
+# settings.py
+AUTH_USER_MODEL = "accounts.User"    # app_name.ModelName
+```
+
+Now use it everywhere:
+```python
+from django.contrib.auth import get_user_model
+
+User = get_user_model()              # always use this, not direct import
+```
+
+---
+
+## 50. Custom User with AbstractBaseUser (Email Login)
+
+Use when you want to **login with email instead of username**.
+
+```python
+# accounts/models.py
+from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import PermissionsMixin
+from django.db import models
+
+
+class UserManager(BaseUserManager):
+
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError("Email is required")
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+        return self.create_user(email, password, **extra_fields)
+
+
+class User(AbstractBaseUser, PermissionsMixin):
+    email = models.EmailField(unique=True)
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    phone = models.CharField(max_length=15, blank=True)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    date_joined = models.DateTimeField(auto_now_add=True)
+
+    objects = UserManager()
+
+    USERNAME_FIELD = "email"                   # login with email
+    REQUIRED_FIELDS = ["first_name", "last_name"]
+
+    def __str__(self):
+        return self.email
+
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+```
+
+```python
+# settings.py
+AUTH_USER_MODEL = "accounts.User"
+```
+
+---
+
+## 51. Using Custom User in Other Models
+
+```python
+# WRONG - hardcodes Django's default User
+from django.contrib.auth.models import User
+
+class Order(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+
+# CORRECT - works with any custom user model
+from django.conf import settings
+
+class Order(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+```
+
+And when you need the User class in Python code:
+```python
+from django.contrib.auth import get_user_model
+
+User = get_user_model()               # returns whatever AUTH_USER_MODEL is set to
+```
+
+---
+
+## 52. Django Permissions System
+
+When you create a model, Django auto-creates 4 permissions:
+
+```python
+class Product(models.Model):
+    name = models.CharField(max_length=100)
+```
+
+Auto-created permissions:
+```
+products.add_product
+products.change_product
+products.delete_product
+products.view_product
+```
+
+### Checking Permissions
+
+```python
+# In views
+if request.user.has_perm("products.add_product"):
+    # allow
+
+if request.user.has_perm("products.delete_product"):
+    # allow
+
+# In templates
+{% if perms.products.add_product %}
+    <button>Add Product</button>
+{% endif %}
+```
+
+### Custom Permissions on Models
+
+```python
+class Patient(models.Model):
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        permissions = [
+            ("view_patient_records", "Can view patient medical records"),
+            ("export_patient_data", "Can export patient data to CSV"),
+        ]
+```
+
+---
+
+## 53. Django Groups (Roles)
+
+Groups act as **roles** in Django's permission system.
+
+```
+User
+  |
+  v
+Group (Role)  e.g., "Manager"
+  |
+  v
+Permissions   e.g., add_product, change_product
+```
+
+### Creating Groups and Assigning Permissions
+
+```python
+from django.contrib.auth.models import Group, Permission
+
+# Create a role
+manager_group = Group.objects.create(name="Manager")
+
+# Assign permissions to the role
+add_perm = Permission.objects.get(codename="add_product")
+change_perm = Permission.objects.get(codename="change_product")
+view_perm = Permission.objects.get(codename="view_product")
+
+manager_group.permissions.set([add_perm, change_perm, view_perm])
+
+# Assign user to role
+user.groups.add(manager_group)
+
+# Now user inherits all Manager permissions
+user.has_perm("products.add_product")    # True
+user.has_perm("products.delete_product") # False (not assigned to Manager)
+```
+
+---
+
+## 54. RBAC Example — Full System
+
+```
+Roles          |  View  | Add  | Change | Delete
+---------------|--------|------|--------|-------
+Admin          |   ✓    |  ✓   |   ✓    |   ✓
+Manager        |   ✓    |  ✓   |   ✓    |   ✗
+Employee       |   ✓    |  ✗   |   ✗    |   ✗
+Customer       |  Own   |  ✗   |  Own   |   ✗
+```
+
+### Setup Script
+
+```python
+from django.contrib.auth.models import Group, Permission
+
+def setup_roles():
+    # Create groups
+    admin_group, _ = Group.objects.get_or_create(name="Admin")
+    manager_group, _ = Group.objects.get_or_create(name="Manager")
+    employee_group, _ = Group.objects.get_or_create(name="Employee")
+
+    all_perms = Permission.objects.filter(content_type__app_label="products")
+    manager_perms = all_perms.exclude(codename="delete_product")
+    view_only = all_perms.filter(codename="view_product")
+
+    admin_group.permissions.set(all_perms)
+    manager_group.permissions.set(manager_perms)
+    employee_group.permissions.set(view_only)
+```
+
+---
+
+## 55. Custom Role Decorator (FBV)
+
+```python
+from functools import wraps
+from django.shortcuts import redirect
+
+
+def role_required(*roles):
+    def decorator(view_func):
+        @wraps(view_func)
+        def wrapper(request, *args, **kwargs):
+            if not request.user.is_authenticated:
+                return redirect("login")
+            user_groups = request.user.groups.values_list("name", flat=True)
+            if not any(role in user_groups for role in roles):
+                return redirect("access_denied")
+            return view_func(request, *args, **kwargs)
+        return wrapper
+    return decorator
+
+
+# Usage
+@role_required("Admin", "Manager")
+def reports_view(request):
+    return render(request, "reports.html")
+
+
+@role_required("Admin")
+def admin_panel(request):
+    return render(request, "admin_panel.html")
+```
+
+---
+
+## 56. Object-Level Authorization (Ownership Check)
+
+Model-level permissions answer: "Can this user add/edit products?"
+Object-level answers: "Can this user edit **this specific** product?"
+
+```python
+# Example: User can only edit their own orders
+def order_update(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+
+    # Object-level check
+    if order.user != request.user and not request.user.has_perm("orders.change_order"):
+        return HttpResponseForbidden("You cannot edit this order.")
+
+    # proceed with update
+    ...
+```
+
+### Django Guardian (Third-party Object-Level Permissions)
+
+```bash
+pip install django-guardian
+```
+
+```python
+from guardian.shortcuts import assign_perm, has_perm
+
+# Assign object-level permission
+assign_perm("change_order", user, order_instance)
+
+# Check object-level permission
+if has_perm("change_order", user, order_instance):
+    # allow
+```
+
+---
+
+## 57. Django REST Framework Authentication & Authorization
+
+For API-based projects (React + DRF):
+
+### DRF Built-in Permission Classes
+
+```python
+from rest_framework.permissions import (
+    IsAuthenticated,
+    IsAdminUser,
+    AllowAny,
+    IsAuthenticatedOrReadOnly,
+)
+
+class ProductViewSet(ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    permission_classes = [IsAuthenticated]    # logged-in users only
+```
+
+### Custom DRF Permission Classes
+
+```python
+from rest_framework.permissions import BasePermission
+
+
+# Role-based
+class IsManager(BasePermission):
+    def has_permission(self, request, view):
+        return (
+            request.user.is_authenticated
+            and request.user.groups.filter(name="Manager").exists()
+        )
+
+
+# Permission-based (preferred)
+class CanDeleteProduct(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.has_perm("products.delete_product")
+
+
+# Object-level
+class IsOwnerOrAdmin(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if request.user.is_superuser:
+            return True
+        return obj.user == request.user
+
+
+# Usage
+class OrderDetailView(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+```
+
+---
+
+## 58. JWT Authentication (React + Django)
+
+For SPA (Single Page Application) frontends, **JWT (JSON Web Token)** is the standard.
+
+### Install Simple JWT
+
+```bash
+pip install djangorestframework-simplejwt
+```
+
+### Settings
+
+```python
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+}
+```
+
+### URLs
+
+```python
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
+urlpatterns = [
+    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+]
+```
+
+### JWT Flow
+
+```
+React
+  |  POST /api/token/  {email, password}
+  v
+Django (authenticate)
+  |
+  v
+JWT Response:
+{
+  "access":  "<short-lived token>",   // expires in 5 min
+  "refresh": "<long-lived token>"     // expires in 1 day
+}
+  |
+  v
+React stores tokens
+
+Next API calls:
+Authorization: Bearer <access-token>
+  |
+  v
+Django validates token -> identifies user -> runs view
+```
+
+### Access Token vs Refresh Token
+
+| | Access Token | Refresh Token |
+|---|---|---|
+| **Lifespan** | Short (5–15 min) | Longer (1–7 days) |
+| **Used for** | API requests | Getting new access tokens |
+| **Storage** | Memory or localStorage | HttpOnly cookie (secure) |
+
+---
+
+## 59. 401 vs 403 — Critical Difference
+
+```
+401 Unauthorized
+    = Authentication problem
+    = "I don't know who you are"
+    = No token / invalid token / expired token
+
+403 Forbidden
+    = Authorization problem
+    = "I know who you are, but you can't do this"
+    = Valid login, but missing permission
+```
+
+### Examples
+
+```
+No JWT token provided           → 401
+JWT token expired               → 401
+Wrong password on login         → 401
+
+Logged in, but not an Admin     → 403
+Logged in, missing permission   → 403
+Trying to edit another user's data → 403
+```
+
+---
+
+## 60. Complete Authentication Flow
+
+```
+Request: DELETE /api/products/10/
+Authorization: Bearer <jwt-token>
+         |
+         v
+JWTAuthentication middleware
+         |
+     Valid token?
+    /            \
+   NO            YES
+   |              |
+  401         Identify user
+              (request.user = Jay)
+                   |
+                   v
+            Permission check
+         has_perm("products.delete_product")?
+             /              \
+            NO              YES
+            |                |
+           403          Object check
+                    (is Jay allowed to delete
+                     this specific product?)
+                         /         \
+                        NO         YES
+                        |           |
+                       403       Delete
+                                   |
+                                   v
+                                 204 No Content
+```
+
+---
+
+## 61. Role Field vs Django Groups
+
+### Role Field Approach (Simpler)
+
+```python
+class User(AbstractUser):
+    class Role(models.TextChoices):
+        ADMIN = "ADMIN", "Admin"
+        MANAGER = "MANAGER", "Manager"
+        EMPLOYEE = "EMPLOYEE", "Employee"
+        CUSTOMER = "CUSTOMER", "Customer"
+
+    role = models.CharField(
+        max_length=20,
+        choices=Role.choices,
+        default=Role.CUSTOMER
+    )
+
+# Usage
+if request.user.role == User.Role.MANAGER:
+    ...
+```
+
+Good for: Simple apps with fixed, small number of roles.
+
+### Django Groups Approach (Scalable)
+
+Good for: Complex apps where permissions change, roles have many permissions, or you use Django Admin.
+
+```python
+# Preferred for most production Django apps
+request.user.has_perm("products.delete_product")
+request.user.groups.filter(name="Manager").exists()
+```
+
+> For internship projects: **start with Groups + Permissions**. It's the Django-idiomatic way.
+
+---
+
+## 62. Hospital Management System — RBAC Example
+
+A real-world RBAC design your interviewer might ask you to design:
+
+```
+Roles:
+  Admin, Doctor, Receptionist, Patient
+
+Permissions Matrix:
+                     | Admin | Doctor | Receptionist | Patient |
+---------------------|-------|--------|--------------|---------|
+View all patients    |  Yes  |  Yes   |     Yes      |   No    |
+View own record      |  Yes  |  Yes   |     Yes      |   Yes   |
+Add patient          |  Yes  |  No    |     Yes      |   No    |
+Edit patient         |  Yes  |  Yes   |     Yes      |  Own    |
+Delete patient       |  Yes  |  No    |     No       |   No    |
+View appointments    |  Yes  |  Yes   |     Yes      |  Own    |
+Create appointment   |  Yes  |  No    |     Yes      |   No    |
+View medical records |  Yes  |  Yes   |     No       |  Own    |
+Manage users         |  Yes  |  No    |     No       |   No    |
+```
+
+Key insight: "Own" means **object-level permission** (you can only access your own data).
+
+---
+
+## 63. Authentication Security Best Practices
+
+| Rule | Why |
+|---|---|
+| Never store plain passwords | Use `create_user()` or `set_password()` |
+| Never return passwords in API responses | Security — even hashed |
+| Always use HTTPS in production | Credentials intercepted over HTTP |
+| Set `AUTH_USER_MODEL` early | Hard to change after migrations exist |
+| Use `get_user_model()` not direct import | Works with any custom user model |
+| Use `settings.AUTH_USER_MODEL` in ForeignKeys | Same reason |
+| Keep access tokens short-lived | Reduces damage if stolen |
+| Use HttpOnly cookies for refresh tokens | Prevents JS access (XSS protection) |
+| Backend authorization is mandatory | Frontend button hiding can be bypassed |
+| Principle of Least Privilege | Give only permissions that are needed |
+| `DEBUG = False` in production | Never expose stack traces |
+
+---
+
+## 64. Authentication & Authorization Quick Revision
+
+```
+Authentication System
+  |
+  +-- User model (AbstractUser / AbstractBaseUser)
+  |     +-- AUTH_USER_MODEL in settings.py
+  |     +-- get_user_model() to access it
+  |
+  +-- authenticate() -> returns user or None
+  +-- login(request, user) -> creates session
+  +-- logout(request) -> destroys session
+  +-- request.user -> current user
+  +-- request.user.is_authenticated
+  |
+  +-- Password
+        +-- create_user() -> hashes automatically
+        +-- set_password() -> hash and set
+        +-- check_password() -> verify
+
+Authorization System
+  |
+  +-- Permissions (auto-created per model)
+  |     +-- add_X, change_X, delete_X, view_X
+  |     +-- user.has_perm("app.codename")
+  |
+  +-- Groups (Roles)
+  |     +-- Group.objects.create(name="Manager")
+  |     +-- group.permissions.add(permission)
+  |     +-- user.groups.add(group)
+  |
+  +-- Decorators
+  |     +-- @login_required
+  |     +-- @permission_required("app.perm")
+  |     +-- LoginRequiredMixin (CBV)
+  |     +-- PermissionRequiredMixin (CBV)
+  |
+  +-- Object-level
+        +-- Check obj.user == request.user
+        +-- django-guardian for complex cases
+
+JWT (for APIs)
+  |
+  +-- Simple JWT package
+  +-- Access Token (short-lived)
+  +-- Refresh Token (longer-lived)
+  +-- Authorization: Bearer <token>
+
+Status Codes
+  +-- 401 = Authentication failed (who are you?)
+  +-- 403 = Authorization failed (you can't do this)
+```
+
+---
+
+## 65. Authentication & Authorization Interview Questions
+
+### Beginner
+
+**Q1. What is the difference between authentication and authorization?**
+
+Authentication verifies *who* the user is (login). Authorization determines *what* the authenticated user is allowed to do (permissions).
+
+**Q2. How does Django store passwords?**
+
+Django hashes passwords using a configurable password hasher (PBKDF2 by default). It never stores plain text. `create_user()` and `set_password()` handle hashing automatically.
+
+**Q3. What does `authenticate()` return?**
+
+It returns the `User` object if credentials are valid, or `None` if invalid.
+
+**Q4. What does `login(request, user)` do?**
+
+It creates an authenticated session for the user and stores the session ID in a cookie on the browser.
+
+**Q5. What is `request.user`?**
+
+The currently authenticated user object, made available by `AuthenticationMiddleware`. If not logged in, it's an `AnonymousUser`.
+
+---
+
+### Intermediate
+
+**Q6. Why should you override the default User model?**
+
+To add custom fields (phone, role, date_of_birth), change the login field (email instead of username), or customize authentication behavior.
+
+**Q7. What is `AbstractUser` vs `AbstractBaseUser`?**
+
+`AbstractUser` extends the full default User and is used to add extra fields while keeping standard username-based auth. `AbstractBaseUser` provides only the bare minimum (password + last_login) and is used when you need full control, like email-based login.
+
+**Q8. Why set `AUTH_USER_MODEL` at the beginning of a project?**
+
+Changing it later requires complex migration adjustments to all ForeignKey references. Setting it early avoids this problem.
+
+**Q9. What is `get_user_model()`?**
+
+A function that returns whatever User model is set in `AUTH_USER_MODEL`. Always use this instead of importing `User` directly, so your code works with custom user models.
+
+**Q10. What are Django Groups?**
+
+Groups act as roles. Users belong to one or more groups. Permissions are assigned to groups. Users inherit their groups' permissions.
+
+---
+
+### Advanced
+
+**Q11. How do you implement object-level authorization?**
+
+Check ownership in the view: `if obj.user != request.user`. For complex cases, use `django-guardian` which supports per-object permissions.
+
+**Q12. What is JWT and how does it work with Django?**
+
+JWT is a stateless token-based authentication mechanism. The client sends `Authorization: Bearer <token>` with each request. Django validates the token, identifies the user, and proceeds — no server-side session storage needed.
+
+**Q13. What is the difference between access and refresh tokens?**
+
+Access tokens are short-lived (minutes) and used for API requests. Refresh tokens are longer-lived and used only to obtain new access tokens when the old one expires.
+
+**Q14. What is the difference between 401 and 403?**
+
+401 = Authentication problem (who are you?). 403 = Authorization problem (I know who you are, but you can't do this).
+
+**Q15. Why is hiding frontend buttons not enough for security?**
+
+A malicious user can bypass the UI and send direct HTTP requests to your API. Backend authorization must always be enforced regardless of what the frontend shows.
+
+**Q16. How do you design RBAC for a hospital system?**
+
+Define roles (Admin, Doctor, Receptionist, Patient) as Django Groups. Assign appropriate permissions to each group. Add object-level checks for "Own" cases (e.g., a patient can only view their own records). Layer: Authentication -> Role check -> Permission check -> Object ownership check.
+
+**Q17. What is `settings.AUTH_USER_MODEL` and why use it in ForeignKeys?**
+
+It's the string reference to your custom User model (e.g., `"accounts.User"`). Using it in ForeignKeys (`models.ForeignKey(settings.AUTH_USER_MODEL, ...)`) ensures your models work correctly regardless of which User model is configured.
+
+---
+
+*Updated: Authentication, Authorization, Custom User Model, RBAC, JWT — Stage 4 Django Internship Guide*

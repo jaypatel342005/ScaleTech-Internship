@@ -2,6 +2,21 @@
     "latest_version": "Python 3.14.7",
     "news": [
         {
+            "title": "Announcing the 2026 PSF Board Election Results!",
+            "href": "https://pyfound.blogspot.com/2026/09/announcing-2026-psf-board-election.html",
+            "date": "2026-09-17"
+        },
+        {
+            "title": "Announcing the 2026 Python Packaging Council Election Results!",
+            "href": "https://pyfound.blogspot.com/2026/09/announcing-2026-python-packaging.html",
+            "date": "2026-09-17"
+        },
+        {
+            "title": "Announcing the PSF Strategic Plan 2026",
+            "href": "https://pyfound.blogspot.com/2026/09/announcing-psf-strategic-plan-2026.html",
+            "date": "2026-09-15"
+        },
+        {
             "title": "The 2026 PSF Board Election is Open!",
             "href": "https://pyfound.blogspot.com/2026/09/the-2026-psf-board-election-is-open.html",
             "date": "2026-09-01"
@@ -10,33 +25,13 @@
             "title": "Inaugural Python Packaging Council Election: Voting is now open!",
             "href": "https://pyfound.blogspot.com/2026/09/inaugural-python-packaging-council.html",
             "date": "2026-09-01"
-        },
-        {
-            "title": "Python 3.15.0 candidate 2 is here!",
-            "href": "https://blog.python.org/2026/09/python-3150-rc2/",
-            "date": "2026-09-01"
-        },
-        {
-            "title": "Kojo Idrissa: 2026 PSF Board Election Candidate Interview",
-            "href": "https://pyfound.blogspot.com/2026/08/kojo-idrissa-2026-psf-board-election.html",
-            "date": "2026-08-31"
-        },
-        {
-            "title": "Ramya Ravi: 2026 PSF Board Election Candidate Interview",
-            "href": "https://pyfound.blogspot.com/2026/08/ramya-ravi-2026-psf-board-election.html",
-            "date": "2026-08-25"
         }
     ],
     "events": [
         {
-            "event": "PyDay Boyacá 2026",
-            "href": "/events/python-events/2202/",
-            "date": "2026-09-12"
-        },
-        {
-            "event": "PyCon Cameroon 2026",
-            "href": "/events/python-events/2159/",
-            "date": "2026-09-17"
+            "event": "Django on the Med 2026",
+            "href": "/events/python-user-group/2208/",
+            "date": "2026-09-23"
         },
         {
             "event": "PythonCamp Rügen 2026",
@@ -52,6 +47,11 @@
             "event": "PyCon Africa 2026",
             "href": "/events/python-events/2187/",
             "date": "2026-10-07"
+        },
+        {
+            "event": "PyCon Estonia 2026",
+            "href": "/events/python-events/2134/",
+            "date": "2026-10-08"
         }
     ],
     "applications": [
