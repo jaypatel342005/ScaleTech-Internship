@@ -81,7 +81,12 @@ def role_delete(request , id):
     )
 
 # Update the list of access modules (ensure unique values).
+@csrf_protect
 def access_update(request):
+    """
+    Handles PUT requests to update access modules of a role.
+    Expected data: id, accessModules (list of unique values)
+    """
     if request.method == "PUT":
         try:
             data = json.loads(request.body)
@@ -104,5 +109,90 @@ def access_update(request):
             )
     return JsonResponse(
         {"message": "Only PUT method is allowed"},
+        status=405
+    )
+
+
+# Remove the list of access modules (ensure unique values).
+@csrf_protect
+def access_remove(request):
+    """
+    Handles PUT requests to remove access modules from a role.
+    Expected data: id, accessModules (list of unique values to remove)
+    """
+    if request.method == "PUT":
+        try:
+           data = json.loads(request.body)
+           role_id = data.get("id")
+           acss_remove = data.get("accessModules")
+           acss_list = Role.objects.filter(id=role_id).values("accessModules")[0]["accessModules"]
+           for i in acss_remove:
+               if i in acss_list:
+                   acss_list.remove(i)
+               else:
+                   return JsonResponse(
+                       {"message": "Access module not found"},
+                       status=404
+                   )
+           Role.objects.filter(id=role_id).update(accessModules=acss_list)
+           return JsonResponse(
+                   {"message": "Access modules removed successfully"},
+                   status=200
+               )
+        except Exception as e:
+            return JsonResponse(
+                {"error": str(e)},
+                status=400
+            )
+    return JsonResponse(
+        {"message": "Only PUT method is allowed"},
+        status=405
+    )
+    
+
+def role_search(request):
+    """Handles GET requests to search for roles.
+    Expected data: searchBy, searchValue"""
+    try:
+        search_by = request.GET.get("searchBy")
+        search_value = request.GET.get("searchValue")
+
+        if search_by == "roleName":
+            roles = Role.objects.filter(roleName=search_value)
+        elif search_by == "accessModules":
+           roles = Role.objects.filter(accessModules__icontains=search_value)
+
+        elif search_by == "active":
+            roles = Role.objects.filter(active=search_value)
+        else:
+            return JsonResponse(
+                {"message": "Invalid search field"},
+                status=400
+            )
+
+        roles_list = []
+
+        for role in roles:
+            roles_list.append(
+                {
+                    "id": role.id,
+                    "roleName": role.roleName,
+                    "accessModules": role.accessModules,
+                    "active": role.active
+                }
+            )
+
+        return JsonResponse(
+            {"roles": roles_list},
+            status=200
+        )
+    except Exception as e:
+        return JsonResponse(
+            {"error": str(e)},
+            status=400
+        )
+
+    return JsonResponse(
+        {"message": "Only GET method is allowed"},
         status=405
     )

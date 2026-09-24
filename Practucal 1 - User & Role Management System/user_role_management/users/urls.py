@@ -13,6 +13,8 @@ urlpatterns = [
     path('logout/',views.logout, name = 'logout'),
     path('signup/',views.signup, name = 'signup'),
     path('update-multiple/',views.update_multiple, name = 'update_multiple'),
-    path('bulk-update/', views.update_multiple, name="bulk-update"),
+    path('bulk-update/', views.update_multiple_diff, name="bulk-update"),
+    path('access-check/<str:module>/' ,views.access_check, name="access-check"),
+    path('search/' ,views.user_search, name="user_search"),
     
 ]

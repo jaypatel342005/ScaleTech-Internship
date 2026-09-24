@@ -5,6 +5,8 @@ from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import authenticate
 from django.db.models import When, Case, Value, CharField
+from django.contrib.auth import logout as auth_logout
+from roles.models import Role
 
 
 
@@ -169,12 +171,12 @@ def update_multiple(request):
     if request.method == "PUT":
         try:
             data = json.loads(request.body)
-            list = data["ids"]
+            list1 = data["ids"]
             val = data["data"]
-            # for id in list:
+            # for id in list1:
             #     Users.objects.filter(id=id).update(**val)
 
-            Users.objects.filter(id__in=list).update(**val)
+            Users.objects.filter(id__in=list1).update(**val)
             return JsonResponse(
                 {"message": "Users updated successfully"},
                 status=200
@@ -183,8 +185,11 @@ def update_multiple(request):
             
         except Exception as e:
             return JsonResponse(
-                {"error": str(e)},
-                status=400
+                {
+                    "error": str(e),
+                    "type": type(e).__name__
+                },
+                status=400  
             )
     return JsonResponse(
         {"message": "Only PUT method is allowed"},
@@ -194,7 +199,7 @@ def update_multiple(request):
 
 #PUT request to update multiple users with diffrent data in single database call
 @csrf_protect
-def update_multiple(request):
+def update_multiple_diff(request):
     """Handles PUT requests to update multiple users with different data.
     Expected data:
         - fields: list of fields to update (allowed: firstName, lastName, email, role_id)
@@ -344,7 +349,7 @@ def logout(request):
     """Handles POST requests to log out a user."""
     try:
         if request.method == "POST":
-            logout(request)
+            auth_logout(request)
             return JsonResponse(
                 {"message": "User logged out successfully"},
                 status=200
@@ -414,5 +419,93 @@ def signup(request):
         status=405
     )
 
-        
 
+#Access check API
+def access_check(request,module):
+    """Handles GET requests to check user access to a module."""
+    if request.method == "GET":
+        if not request.user.is_authenticated:
+            return JsonResponse(
+                {"message": "User is not logged in"},
+                status=401
+            )
+        try:
+            user = Users.objects.get(id=request.user.id)
+            role = Role.objects.get(id=user.role_id)
+
+            if module in role.accessModules:
+                return JsonResponse(
+                    {"message": "Access granted"},
+                    status=200
+                )
+            return JsonResponse(
+                {"message": "Access denied"},
+                status=403
+            )
+        except Exception as e:
+            return JsonResponse(
+                {"error": str(e)},
+                status=400
+            )
+    return JsonResponse(
+        {"message": "Only POST method is allowed"},
+        status=405
+    )
+
+
+
+#User Search API
+def user_search(request):
+    """Handles GET requests to search for users.
+    Parameters:
+    - searchBy: field to search by (username, firstName, lastName, email, role_id)
+    - searchValue: value to search for
+    """
+    try:
+        search_by = request.GET.get("searchBy")
+        search_value = request.GET.get("searchValue")
+
+        if search_by == "username":
+            users = Users.objects.filter(username=search_value)
+        elif search_by == "firstName":
+            users = Users.objects.filter(firstName=search_value)
+        elif search_by == "lastName":
+            users = Users.objects.filter(lastName=search_value)
+        elif search_by == "email":
+            users = Users.objects.filter(email=search_value)
+        elif search_by == "role_id":
+            users = Users.objects.filter(role_id=search_value)
+        else:
+            return JsonResponse(
+                {"message": "Invalid search field"},
+                status=400
+            )
+
+        users_list = []
+
+        for user in users:
+            users_list.append(
+                {
+                    "id": user.id,
+                    "username": user.username,
+                    "firstName": user.firstName,
+                    "lastName": user.lastName,
+                    "email": user.email,
+                    "role_id": user.role_id
+                }
+            )
+
+        return JsonResponse(
+            {"users": users_list},
+            status=200
+        )
+    except Exception as e:
+        return JsonResponse(
+            {"error": str(e)},
+            status=400
+        )
+   
+    return JsonResponse(
+        {"message": "Only GET method is allowed"},
+        status=405
+    )

@@ -15,10 +15,17 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path , include
+from django.urls import path, include
+from .swagger_view import swagger_ui, openapi_json
 
 urlpatterns = [
+    # Swagger UI — served at the root
+    path('', swagger_ui, name='swagger-ui'),
+
+    # Raw OpenAPI 3.0 spec (useful for importing into Postman / other tools)
+    path('api/schema.json', openapi_json, name='openapi-schema'),
+
     path('admin/', admin.site.urls),
     path('api/user/', include('users.urls')),
-    path('api/role/', include('roles.urls'))
+    path('api/role/', include('roles.urls')),
 ]

@@ -1,0 +1,3 @@
+# ── User & Role Management System ─────────────────────────────────────────────
+# Django core
+Django==6.1.1
