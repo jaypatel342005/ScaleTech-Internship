@@ -8,5 +8,10 @@ class StudentSerializer(serializers.ModelSerializer):
         model = Student
         fields = '__all__'
 
+    def validate(self, attrs):
+        if attrs['stu_age'] < 18:
+            raise serializers.ValidationError({'age': 'Age must be at least 18'})
+        
+
 
     
